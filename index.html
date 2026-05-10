@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<title>Rodinné Finance · 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f2f2f7;--s:#fff;--border:rgba(60,60,67,.12);
+  --t1:#1c1c1e;--t2:#3c3c43;--t3:#8e8e93;
+  --blue:#007aff;--green:#34c759;--red:#ff3b30;--orange:#ff9500;--purple:#af52de;
+  --r:16px;--r2:12px;--r3:10px;
+  --sh:0 2px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04);
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100dvh;overscroll-behavior:none}
+#hd{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;
+  background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 18px;padding-top:env(safe-area-inset-top);gap:10px}
+#hd-logo{width:32px;height:32px;background:linear-gradient(135deg,#007aff,#5856d6);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+#hd-info{flex:1}
+#hd-title{font-size:16px;font-weight:600;letter-spacing:-.3px}
+#hd-sub{font-size:11px;color:var(--t3);margin-top:1px}
+#hd-right{display:flex;align-items:center;gap:7px}
+#live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,199,89,.4)}50%{box-shadow:0 0 0 5px rgba(52,199,89,0)}}
+#hd-time{font-size:11px;color:var(--t3)}
+#rbtn{width:32px;height:32px;background:var(--bg);border:none;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--blue);font-size:15px}
+#rbtn.spin{animation:rspin .6s linear}
+@keyframes rspin{to{transform:rotate(360deg)}}
+#content{padding-top:62px;padding-bottom:88px}
+#tb{position:fixed;bottom:0;left:0;right:0;z-index:200;height:84px;
+  background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--border);
+  display:flex;padding-top:10px;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;user-select:none;color:var(--t3);transition:color .18s}
+.tab.on{color:var(--blue)}
+.ti{font-size:22px;line-height:1;transition:transform .15s}
+.tab:active .ti{transform:scale(.85)}
+.tl{font-size:10px;font-weight:500}
+.panel{display:none;animation:fup .28s ease}.panel.on{display:block}
+@keyframes fup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;gap:14px}
+.lring{width:36px;height:36px;border:3px solid var(--bg);border-top-color:var(--blue);border-radius:50%;animation:rspin .8s linear infinite}
+#loading p{font-size:14px;color:var(--t3)}
+.sec{padding:14px 16px 0}.sec-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:8px;padding-left:2px}
+.card{background:var(--s);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}.card+.card{margin-top:12px}
+.hero{background:var(--s);border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin:14px 16px 0}
+.hlbl{font-size:12px;font-weight:500;color:var(--t3);margin-bottom:3px}
+.hval{font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1.1}
+.hval.neg{color:var(--red)}.hval.pos{color:var(--green)}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.hcell{background:var(--bg);border-radius:var(--r3);padding:11px 13px}
+.hcl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--t3);margin-bottom:3px}
+.hcv{font-size:18px;font-weight:700;letter-spacing:-.5px}
+.hcv.inc{color:var(--green)}.hcv.exp{color:var(--red)}
+.mrow{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+.mrow:last-child{border-bottom:none}
+.micon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-right:11px;background:var(--bg)}
+.minfo{flex:1;min-width:0}
+.mname{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdet{font-size:11px;color:var(--t3);margin-top:1px}
+.mval{font-size:14px;font-weight:600;flex-shrink:0;margin-left:10px}
+.mval.g{color:var(--green)}.mval.r{color:var(--red)}.mval.b{color:var(--blue)}.mval.m{color:var(--t3)}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.kcell{background:var(--bg);border-radius:var(--r3);padding:13px}
+.kl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--t3);margin-bottom:5px}
+.kv{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.kv.g{color:var(--green)}.kv.r{color:var(--red)}.kv.b{color:var(--blue)}.kv.p{color:var(--purple)}
+.mpills{display:flex;gap:5px;overflow-x:auto;padding:14px 16px 0;scrollbar-width:none}
+.mpills::-webkit-scrollbar{display:none}
+.mpill{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--t2);border:1.5px solid transparent;transition:all .15s}
+.mpill.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.mpill.dim{opacity:.35;pointer-events:none}
+.vhrow{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:8px}
+.vhrow:last-child{border-bottom:none}
+.vhmn{font-size:13px;font-weight:500;min-width:44px}
+.vhbar-w{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.vhbar{height:100%;border-radius:3px;min-width:2px}
+.vhbar.n{background:var(--red)}.vhbar.p{background:var(--green)}
+.vhval{font-size:12px;font-weight:600;min-width:88px;text-align:right}
+.vhval.n{color:var(--red)}.vhval.p{color:var(--green)}
+.ahero{background:linear-gradient(135deg,#007aff,#5856d6);border-radius:var(--r);padding:20px;margin:14px 16px 0;color:#fff}
+.ahlbl{font-size:12px;opacity:.8;margin-bottom:3px}
+.ahval{font-size:36px;font-weight:700;letter-spacing:-1px}
+.ahbadges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.ahbadge{background:rgba(255,255,255,.2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500}
+.ahbadge span{opacity:.75}
+.dw{padding:16px;display:flex;align-items:center;gap:16px}
+.rbox{flex-shrink:0;position:relative;width:66px;height:66px}
+.rbox svg{transform:rotate(-90deg)}
+.rtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.drows{flex:1}
+.drow{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px}
+.drow:last-child{margin-bottom:0}
+.drl{color:var(--t3)}.drv{font-weight:600}
+.prow{display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);gap:8px}
+.prow:last-child{border-bottom:none}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pinfo{flex:1;min-width:0}
+.pname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psub{font-size:10px;color:var(--t3);margin-top:1px}
+.pbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;flex-shrink:0;text-transform:uppercase;letter-spacing:.3px}
+.pb-pas{background:rgba(52,199,89,.12);color:var(--green)}
+.pb-akt{background:rgba(175,82,222,.1);color:var(--purple)}
+.pb-spo{background:rgba(0,122,255,.1);color:var(--blue)}
+.pb-vyd{background:rgba(255,59,48,.08);color:var(--red)}
+.pvals{text-align:right;flex-shrink:0;min-width:72px}
+.pmon{font-size:13px;font-weight:600}.pyear{font-size:10px;color:var(--t3);margin-top:1px}
+.prg{padding:0 16px 13px}
+.prgh{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px}
+.prgt{font-weight:500}.prgp{font-weight:700;color:var(--blue)}
+.prgb{height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.prgf{height:100%;border-radius:3px;transition:width .8s}
+.upd{text-align:center;font-size:11px;color:var(--t3);padding:14px 0 6px}
+.upd b{color:var(--t2)}
+@media(min-width:600px){#content,#hd,#tb{max-width:480px;margin:0 auto;left:50%;transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+<header id="hd">
+  <div id="hd-logo">💼</div>
+  <div id="hd-info">
+    <div id="hd-title">Rodinné Finance</div>
+    <div id="hd-sub">Tom & Lenka · Matyáš · Elinka · 2026</div>
+  </div>
+  <div id="hd-right">
+    <div id="live-dot"></div>
+    <div id="hd-time">—</div>
+    <button id="rbtn" onclick="refresh()">↻</button>
+  </div>
+</header>
+<main id="content">
+  <div id="loading"><div class="lring"></div><p>Načítám data…</p></div>
+  <div id="app" style="display:none">
+    <div class="panel on" id="tp"></div>
+    <div class="panel" id="tc"></div>
+    <div class="panel" id="tm"></div>
+    <div class="panel" id="tpl"></div>
+  </div>
+</main>
+<nav id="tb">
+  <div class="tab on" onclick="go('p',this)"><div class="ti">📊</div><div class="tl">Přehled</div></div>
+  <div class="tab" onclick="go('c',this)"><div class="ti">💸</div><div class="tl">Cashflow</div></div>
+  <div class="tab" onclick="go('m',this)"><div class="ti">🏛</div><div class="tl">Majetek</div></div>
+  <div class="tab" onclick="go('pl',this)"><div class="ti">📋</div><div class="tl">Plán</div></div>
+</nav>
+<script>
+const SID='1Enami9v_fK1i5JgmMqaIv3vqEZ--mIbDhFIj6aCmsCw';
+const MNF=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+const MNS=['Led','Úno','Bře','Dub','Kvě','Čer','Čvc','Srp','Zář','Říj','Lis','Pro'];
+const FB={
+  monthly:{
+    tomInc:[71000,82700,60000,73000,56695,25000,0,0,0,0,0,0],
+    lnkInc:[19000,19000,19000,19000,19000,19000,0,0,0,0,0,0],
+    famCost:[60039,60039,60039,60039,60039,60039,0,0,0,0,0,0],
+    lnkCost:[19000,19000,19000,19000,19000,19000,0,0,0,0,0,0],
+    other:[75000,105000,84000,45000,30000,0,0,0,0,0,0,0],
+    totInc:[90000,101700,79000,92000,75695,44000,0,0,0,0,0,0],
+    totExp:[154039,184039,163039,124039,109039,79039,0,0,0,0,0,0],
+    vh:[-64039,-82339,-84039,-32039,-33344,-35039,0,0,0,0,0,0],
+    inv:[25539219,25664219,25570219,25659219,0,0,0,0,0,0,0,0]
+  },
+  assets:[
+    {n:'RD Řitka',h:21000000,d:4100000,m:2000000,i:'🏡'},
+    {n:'Antala Staška 35%',h:2520000,d:0,m:0,i:'🏢'},
+    {n:'Degiro',h:710500,d:0,m:0,i:'📈'},
+    {n:'XTB',h:134750,d:0,m:0,i:'📊'},
+    {n:'Portu',h:40000,d:0,m:0,i:'💼'},
+    {n:'Zlato',h:0,d:0,m:0,i:'🪙'},
+    {n:'Crypto',h:3969,d:0,m:0,i:'₿'},
+    {n:'Auto',h:700000,d:600000,m:0,i:'🚗'},
+    {n:'Tomas Challenge',h:50000,d:0,m:0,i:'🏋️'},
+    {n:'SportWave',h:500000,d:200000,m:0,i:'🌊'}
+  ],
+  income:[
+    {n:'Ostatní příjmy',o:'Tom',t:'pasivum',mon:45000,yr:540000},
+    {n:'Marketing – U Kelta',o:'Tom',t:'aktivum',mon:14000,yr:168000},
+    {n:'Marketing – Sazka',o:'Tom',t:'aktivum',mon:20000,yr:240000},
+    {n:'Automaty',o:'Tom',t:'pasivum',mon:1000,yr:12000},
+    {n:'Rodičovská',o:'Lenka',t:'pasivum',mon:0,yr:0},
+    {n:'BF bazar',o:'Tom+Lenka',t:'aktivum',mon:7000,yr:84000}
+  ],
+  expenses:[
+    {n:'ETF Degiro + XTB',o:'Tom',t:'spoření',mon:5000,yr:60000},
+    {n:'Maty spoření',o:'Tom',t:'spoření',mon:1000,yr:12000},
+    {n:'Ella spoření',o:'Tom',t:'spoření',mon:1000,yr:12000},
+    {n:'Hypotéky 1+2',o:'Tom',t:'výdaj',mon:23000,yr:276000},
+    {n:'Maty školka',o:'Tom',t:'výdaj',mon:11200,yr:134400},
+    {n:'Životko',o:'Tom',t:'výdaj',mon:820,yr:9840},
+    {n:'Elektřina záloha',o:'Tom',t:'výdaj',mon:6000,yr:72000},
+    {n:'Netflix',o:'Tom',t:'výdaj',mon:500,yr:6000},
+    {n:'Wifi O2',o:'Tom',t:'výdaj',mon:0,yr:1100},
+    {n:'Jablotron',o:'Tom',t:'výdaj',mon:60,yr:720},
+    {n:'Pojištění úvěrů 1+2',o:'Tom',t:'výdaj',mon:776,yr:9312},
+    {n:'Pojištění domu',o:'Tom',t:'výdaj',mon:583,yr:7000},
+    {n:'Tesla model Y',o:'Tom',t:'výdaj',mon:14000,yr:168000},
+    {n:'Jídlo',o:'Lenka',t:'výdaj',mon:0,yr:0},
+    {n:'Tom ostatní',o:'Tom',t:'výdaj',mon:0,yr:0},
+    {n:'Lenka ostatní',o:'Lenka',t:'výdaj',mon:0,yr:0},
+    {n:'Dovolené',o:'Tom',t:'výdaj',mon:0,yr:100000}
+  ],
+  totalIncome:87000,totalExpenses:65039
+};
+let S={mi:4,data:FB,source:'embedded',updated:'2026-05-10'};
+const fk=v=>{if(v===null||v===undefined||isNaN(v))return'—';if(v===0)return'0 Kč';const a=Math.abs(Math.round(v));return(v<0?'−':'')+a.toLocaleString('cs-CZ')+' Kč'};
+const fs=v=>{if(!v&&v!==0)return'—';const a=Math.abs(v);if(a>=1e6)return(v<0?'−':'')+(a/1e6).toFixed(2).replace(/\.?0+$/,'')+'M';if(a>=1000)return(v<0?'−':'')+Math.round(a/1000)+'k';return fk(v)};
+const pk=s=>{if(!s)return 0;const c=String(s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');const n=parseFloat(c);return isNaN(n)?0:n};
+function gviz(sheet){return new Promise((res,rej)=>{const cb='_gv'+Date.now();const sc=document.createElement('script');const t=setTimeout(()=>{cl();rej(new Error('timeout'))},8000);function cl(){delete window[cb];try{document.head.removeChild(sc)}catch(e){}clearTimeout(t)}window[cb]=d=>{cl();try{const cols=d.table.cols.map(c=>c.label||'');const rows=d.table.rows.map(r=>(r.c||[]).map(c=>c&&c.v!=null?String(c.v):''));res([cols,...rows])}catch(e){rej(e)}};sc.onerror=()=>{cl();rej(new Error('load'))};sc.src=`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&callback=${cb}&sheet=${encodeURIComponent(sheet)}&t=${Date.now()}`;document.head.appendChild(sc)})}
+function parseAktiva(rows){const assets=[],monthly={};let inAssets=false;for(const r of rows){const n=(r[0]||'').trim();if(!n)continue;if(n==='Název'){inAssets=true;continue}if(!inAssets)continue;if(n==='Míra zadlužení'||n.startsWith('1.'))continue;const mLabel=(r[4]||r[5]||'').trim();if(mLabel){monthly[mLabel]=r.slice(5,17).map(v=>pk(v))}const h=pk(r[1]);if(h>0){const icons={'Řitka':'🏡','Staška':'🏢','Degiro':'📈','XTB':'📊','Portu':'💼','Zlato':'🪙','Crypto':'₿','Auto':'🚗','Challenge':'🏋️','Wave':'🌊'};const icon=Object.entries(icons).find(([k])=>n.includes(k));assets.push({n,h,d:pk(r[2]),m:pk(r[3]),i:icon?icon[1]:'💰'})}}return{assets,monthly}}
+function parseCF(rows){const income=[],expenses=[];let ti=0,te=0;const tm={'pasivum':'pasivum','aktivum':'aktivum','spoření':'spoření','investice':'spoření','výdaj':'výdaj'};for(const r of rows){const n=(r[0]||'').trim(),t=(r[2]||'').trim();if(!n)continue;if(n==='Total příjmy'){ti=pk(r[3]);continue}if(n==='Total výdaje'){te=pk(r[3]);continue}if(n.startsWith('Total')||n==='Zůstatek'||n.startsWith('Změna')||n==='DRUH'||!t)continue;const item={n,o:(r[1]||'').trim(),t:tm[t]||t,mon:pk(r[4]),yr:pk(r[5])};if(['pasivum','aktivum'].includes(item.t))income.push(item);else if(['výdaj','spoření'].includes(item.t))expenses.push(item)}return{income,expenses,totalIncome:ti,totalExpenses:te}}
+async function loadLive(){try{const[aR,cR]=await Promise.all([gviz('Aktiva'),gviz('Cashflow')]);const{assets,monthly}=parseAktiva(aR);const cf=parseCF(cR);const g=(k1,k2)=>monthly[k1]||monthly[k2]||new Array(12).fill(0);const totInc=g('Souhrn příjmů',' Souhrn příjmů');const totExp=g('Souhrn výdajů',' Souhrn výdajů');const vh=g('VH rodiny',' VH rodiny');const inv=g('Hodnota investic',' Hodnota investic');const tomInc=g('Příjem Tom',' Příjem Tom');const lnkInc=g('Příjem Lenka',' Příjem Lenka');let lastMi=0;totInc.forEach((v,i)=>{if(v>0)lastMi=i});S.data={monthly:{tomInc,lnkInc,famCost:g('Náklady rodina',' Náklady rodina'),lnkCost:g('Lenka náklady',' Lenka náklady'),other:g('Ostatní výdaje',' Ostatní výdaje'),totInc,totExp,vh,inv},assets:assets.length>0?assets:FB.assets,income:cf.income.length>0?cf.income:FB.income,expenses:cf.expenses.length>0?cf.expenses:FB.expenses,totalIncome:cf.totalIncome||FB.totalIncome,totalExpenses:cf.totalExpenses||FB.totalExpenses};S.mi=lastMi;S.source='live';S.updated=new Date().toLocaleDateString('cs-CZ')}catch(e){S.source='offline'}}
+function go(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));document.getElementById('t'+id).classList.add('on');btn.classList.add('on')}
+function sM(i){S.mi=i;renderOverview();const p=document.querySelectorAll('.mpill');if(p[i])p[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})}
+function renderAll(){renderOverview();renderCashflow();renderAssets();renderPlan()}
+async function refresh(){const b=document.getElementById('rbtn');b.classList.add('spin');setTimeout(()=>b.classList.remove('spin'),700);await loadLive();renderAll();updTime()}
+function updTime(){const n=new Date();document.getElementById('hd-time').textContent=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;document.getElementById('live-dot').style.background=S.source==='live'?'var(--green)':'var(--orange)'}
+function renderOverview(){
+  const d=S.data,mi=S.mi,m=d.monthly;
+  const totIn=m.totInc[mi]||0,totEx=m.totExp[mi]||0,vh=m.vh[mi]||0;
+  const sm=arr=>arr.slice(0,mi+1).reduce((a,b)=>a+(b||0),0);
+  const ytdIn=sm(m.totInc),ytdEx=sm(m.totExp),ytdVH=ytdIn-ytdEx;
+  const ytdInv=m.inv.filter(v=>v>0).slice(-1)[0]||0;
+  const pills=MNF.map((mn,i)=>`<div class="mpill ${i===mi?'on':''} ${m.totInc[i]===0&&i>mi?'dim':''}" onclick="sM(${i})">${MNS[i]}</div>`).join('');
+  const maxA=Math.max(...m.vh.map(Math.abs).filter(v=>v>0),1);
+  const vhRows=MNS.map((mn,i)=>{const v=m.vh[i]||0;if(v===0&&i>mi)return'';const pct=Math.round(Math.abs(v)/maxA*100);const cls=v>=0?'p':'n';return`<div class="vhrow"><div class="vhmn">${mn}</div><div class="vhbar-w"><div class="vhbar ${cls}" style="width:${pct}%"></div></div><div class="vhval ${cls}">${v===0?'—':fk(v)}</div></div>`}).join('');
+  const n=Math.min(6,MNS.length);const incV=m.totInc.slice(0,n),expV=m.totExp.slice(0,n);const maxV=Math.max(...incV,...expV,1);
+  let bc='';for(let i=0;i<n;i++){const x=i*(340/n),cw=340/n,bw=cw*.3,iH=(incV[i]/maxV)*100,eH=(expV[i]/maxV)*100,op=i>mi?.3:1,cur=i===mi;if(cur)bc+=`<rect x="${x+1}" y="8" width="${cw-2}" height="100" rx="5" fill="rgba(0,122,255,.05)"/>`;if(iH>0)bc+=`<rect x="${x+cw/2-bw-1}" y="${108-iH}" width="${bw}" height="${iH}" rx="3" fill="#34c759" opacity="${op}"/>`;if(eH>0)bc+=`<rect x="${x+cw/2+1}" y="${108-eH}" width="${bw}" height="${eH}" rx="3" fill="#ff3b30" opacity="${op}"/>`;bc+=`<text x="${x+cw/2}" y="126" text-anchor="middle" font-size="9" fill="${cur?'#007aff':'#8e8e93'}" font-family="-apple-system,sans-serif" font-weight="${cur?700:400}">${MNS[i]}</text>`}
+  document.getElementById('tp').innerHTML=`
+    <div class="mpills">${pills}</div>
+    <div class="hero"><div class="hlbl">${MNF[mi]} 2026 · Výsledek</div><div class="hval ${vh<0?'neg':'pos'}">${fk(vh)}</div><div class="hgrid"><div class="hcell"><div class="hcl">Příjmy</div><div class="hcv inc">${fk(totIn)}</div></div><div class="hcell"><div class="hcl">Výdaje</div><div class="hcv exp">${fk(totEx)}</div></div></div></div>
+    <div class="sec"><div class="sec-title">Rok 2026 – dosud</div><div class="card"><div class="kgrid"><div class="kcell"><div class="kl">Příjmy celkem</div><div class="kv g">${fs(ytdIn)}</div></div><div class="kcell"><div class="kl">Výdaje celkem</div><div class="kv r">${fs(ytdEx)}</div></div><div class="kcell"><div class="kl">VH hospodaření</div><div class="kv ${ytdVH>=0?'g':'r'}">${fs(ytdVH)}</div></div><div class="kcell"><div class="kl">Hodnota investic</div><div class="kv b">${fs(ytdInv)}</div></div></div></div></div>
+    <div class="sec"><div class="sec-title">Příjmy vs. výdaje</div><div class="card"><div style="padding:14px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:10px">Prvních 6 měsíců 2026</div><svg viewBox="0 0 340 130" style="width:100%;display:block">${bc}</svg></div></div></div>
+    <div class="sec"><div class="sec-title">VH po měsících</div><div class="card">${vhRows}</div></div>
+    <div class="upd">Zdroj: <b>${S.source==='live'?'živá data ze Sheets':'záložní data'}</b> · ${S.updated}</div>
+    <div style="height:8px"></div>`}
+function renderCashflow(){
+  const d=S.data,mi=S.mi,m=d.monthly;
+  const totIn=m.totInc[mi]||0,totEx=m.totExp[mi]||0,vh=m.vh[mi]||0;
+  const icons={'příjmy':'💼','Kelta':'📣','Sazka':'🎯','Automaty':'🎰','dičovsk':'👶','bazar':'♻️','ETF':'📈','Degiro':'📈','Maty sp':'🐣','Ella sp':'🌸','yp':'🏠','kolka':'🏫','tko':'💊','lektr':'⚡','Netflix':'🎬','Wifi':'📶','ablotr':'🔔','úvěr':'🛡','domu':'🏡','Tesla':'🚗','Jídlo':'🛒','olen':'✈️','ostatní':'📦'};
+  const gi=n=>{for(const[k,v] of Object.entries(icons))if(n.toLowerCase().includes(k.toLowerCase()))return v;return'·'};
+  const tc=t=>({'pasivum':'var(--green)','aktivum':'var(--purple)','spoření':'var(--blue)','výdaj':'var(--red)'}[t]||'var(--t3)');
+  const bc=t=>({'pasivum':'pb-pas','aktivum':'pb-akt','spoření':'pb-spo','výdaj':'pb-vyd'}[t]||'pb-vyd');
+  const row=(item,isInc)=>{const val=item.mon||item.yr||0;const cls=isInc?'g':(item.t==='spoření'?'b':'r');const sign=isInc?'+':'−';return`<div class="mrow"><div class="micon">${gi(item.n)}</div><div class="minfo"><div class="mname">${item.n}</div><div class="mdet">${item.o} · ${item.t}</div></div><div class="mval ${val===0?'m':cls}">${val===0?'0 Kč':sign+fk(val)}</div></div>`};
+  document.getElementById('tc').innerHTML=`
+    <div class="sec" style="padding-top:14px"><div class="sec-title">${MNF[mi]} 2026</div><div class="card"><div class="mrow"><div class="micon">💰</div><div class="minfo"><div class="mname">Celkové příjmy</div><div class="mdet">Tom + Lenka + Firmy</div></div><div class="mval g">${fk(totIn)}</div></div><div class="mrow"><div class="micon">💸</div><div class="minfo"><div class="mname">Celkové výdaje</div><div class="mdet">Vše dohromady</div></div><div class="mval r">${fk(totEx)}</div></div><div class="mrow"><div class="micon">${vh>=0?'✅':'⚠️'}</div><div class="minfo"><div class="mname">Výsledek hospodaření</div><div class="mdet">Příjmy − Výdaje</div></div><div class="mval ${vh>=0?'g':'r'}">${fk(vh)}</div></div></div></div>
+    <div class="sec"><div class="sec-title">Příjmy</div><div class="card">${d.income.map(i=>row(i,true)).join('')}</div></div>
+    <div class="sec"><div class="sec-title">Výdaje</div><div class="card">${d.expenses.filter(e=>e.t==='výdaj').map(i=>row(i,false)).join('')}</div></div>
+    <div class="sec"><div class="sec-title">Spoření & Investice</div><div class="card">${d.expenses.filter(e=>e.t==='spoření').map(i=>row(i,false)).join('')}</div></div>
+    <div style="height:8px"></div>`}
+function renderAssets(){
+  const assets=S.data.assets.filter(a=>a.h>0||a.n);
+  const tA=assets.reduce((s,a)=>s+a.h,0),tD=assets.reduce((s,a)=>s+a.d,0),tM=assets.reduce((s,a)=>s+a.m,0);
+  const net=tA-tD-tM,dr=tA>0?Math.round(tD/tA*100):0;
+  const circ=2*Math.PI*28,offset=circ*(1-dr/100);
+  document.getElementById('tm').innerHTML=`
+    <div class="ahero"><div class="ahlbl">Celková hodnota aktiv</div><div class="ahval">${fk(tA)}</div><div class="ahbadges"><div class="ahbadge"><span>Dluh </span>${fk(tD)}</div><div class="ahbadge"><span>Mirek </span>${fk(tM)}</div></div></div>
+    <div class="sec"><div class="sec-title">Čistý majetek</div><div class="card"><div class="kgrid"><div class="kcell"><div class="kl">Čistá aktiva</div><div class="kv b">${fs(tA-tD)}</div></div><div class="kcell"><div class="kl">Vlastní (bez Mirka)</div><div class="kv p">${fs(net)}</div></div><div class="kcell"><div class="kl">Celkový dluh</div><div class="kv r">${fs(tD)}</div></div><div class="kcell"><div class="kl">Míra zadlužení</div><div class="kv ${dr<30?'g':'r'}">${dr} %</div></div></div></div></div>
+    <div class="sec"><div class="sec-title">Zadluženost</div><div class="card"><div class="dw"><div class="rbox"><svg width="66" height="66" viewBox="0 0 66 66"><circle cx="33" cy="33" r="28" fill="none" stroke="var(--bg)" stroke-width="7"/><circle cx="33" cy="33" r="28" fill="none" stroke="${dr<30?'var(--green)':'var(--red)'}" stroke-width="7" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg><div class="rtxt">${dr}%</div></div><div class="drows"><div class="drow"><span class="drl">Celková hodnota</span><span class="drv">${fk(tA)}</span></div><div class="drow"><span class="drl">Celkový dluh</span><span class="drv" style="color:var(--red)">${fk(tD)}</span></div><div class="drow"><span class="drl">Dluh Mirek</span><span class="drv" style="color:var(--orange)">${fk(tM)}</span></div></div></div></div></div>
+    <div class="sec"><div class="sec-title">Jednotlivá aktiva</div><div class="card">${assets.map(a=>`<div class="mrow"><div class="micon">${a.i||'💰'}</div><div class="minfo"><div class="mname">${a.n}</div><div class="mdet">${a.d>0?'Dluh: '+fk(a.d):a.m>0?'Mirek: '+fk(a.m):'Bez dluhu'}</div></div><div class="mval ${a.h>0?'b':'m'}">${a.h>0?fk(a.h):'—'}</div></div>`).join('')}</div></div>
+    <div style="height:8px"></div>`}
+function renderPlan(){
+  const d=S.data,mi=S.mi,m=d.monthly;
+  const yp=Math.round((mi+1)/12*100);
+  const sm=arr=>arr.slice(0,mi+1).reduce((a,b)=>a+(b||0),0);
+  const ytdIn=sm(m.totInc),ytdEx=sm(m.totExp);
+  const annIn=d.totalIncome*12,annEx=d.totalExpenses*12;
+  const inP=Math.min(Math.round(ytdIn/(annIn||1)*100),100),exP=Math.min(Math.round(ytdEx/(annEx||1)*100),100);
+  const tc=t=>({'pasivum':'var(--green)','aktivum':'var(--purple)','spoření':'var(--blue)','výdaj':'var(--red)'}[t]||'var(--t3)');
+  const bc=t=>({'pasivum':'pb-pas','aktivum':'pb-akt','spoření':'pb-spo','výdaj':'pb-vyd'}[t]||'pb-vyd');
+  const prow=item=>{const mon=item.mon||0,yr=item.yr||(mon*12);return`<div class="prow"><div class="pdot" style="background:${tc(item.t)}"></div><div class="pinfo"><div class="pname">${item.n}</div><div class="psub">${item.o}</div></div><div class="pbadge ${bc(item.t)}">${item.t}</div><div class="pvals"><div class="pmon">${mon>0?fk(mon):'—'}</div><div class="pyear">${yr>0?fk(yr)+'/r':''}</div></div></div>`};
+  const pg=(title,pct,color)=>`<div class="prg"><div class="prgh"><span class="prgt">${title}</span><span class="prgp">${pct} %</span></div><div class="prgb"><div class="prgf" style="width:${pct}%;background:${color}"></div></div></div>`;
+  document.getElementById('tpl').innerHTML=`
+    <div class="sec" style="padding-top:14px"><div class="sec-title">Plnění plánu 2026</div><div class="card"><div style="height:14px"></div>${pg(`Rok 2026 · ${mi+1}/12 měs.`,yp,'var(--blue)')}${pg('Plán příjmů YTD',inP,'var(--green)')}${pg('Plán výdajů YTD',exP,'var(--red)')}</div></div>
+    <div class="sec"><div class="sec-title">Roční přehled</div><div class="card"><div class="kgrid"><div class="kcell"><div class="kl">Plán příjmy/rok</div><div class="kv g">${fs(annIn)}</div></div><div class="kcell"><div class="kl">Plán výdaje/rok</div><div class="kv r">${fs(annEx)}</div></div><div class="kcell"><div class="kl">YTD příjmy</div><div class="kv b">${fs(ytdIn)}</div></div><div class="kcell"><div class="kl">YTD výdaje</div><div class="kv r">${fs(ytdEx)}</div></div></div></div></div>
+    <div class="sec"><div class="sec-title">Plán příjmů</div><div class="card">${d.income.map(prow).join('')}</div></div>
+    <div class="sec"><div class="sec-title">Plán výdajů</div><div class="card">${d.expenses.map(prow).join('')}</div></div>
+    <div class="upd">Zdroj: <b>${S.source==='live'?'živá data ze Sheets':'záložní data'}</b> · ${S.updated}</div>
+    <div style="height:8px"></div>`}
+async function boot(){renderAll();document.getElementById('loading').style.display='none';document.getElementById('app').style.display='block';updTime();await loadLive();renderAll();updTime()}
+boot();setInterval(()=>{loadLive().then(()=>{renderAll();updTime()})},5*60*1000);
+</script>
+</body>
+</html>
